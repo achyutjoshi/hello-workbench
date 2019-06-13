@@ -1,10 +1,4 @@
-from fuzzywuzzy import fuzz
-from fuzzywuzzy import process
-import pandas as pd
-import os
-
-
-usa_fips_list = [
+['statefp', 'state_name', 'countyfp', 'county_name'],
 ['1', 'Alabama', '1', 'Autauga County'],
 ['1', 'Alabama', '3', 'Baldwin County'],
 ['1', 'Alabama', '5', 'Barbour County'],
@@ -3247,72 +3241,4 @@ usa_fips_list = [
 ['72', 'Puerto Rico', '153', 'Yauco Municipio'],
 ['78', 'U.S. Virgin Islands', '10', 'St. Croix Island District'],
 ['78', 'U.S. Virgin Islands', '20', 'St. John Island District'],
-['78', 'U.S. Virgin Islands', '30', 'St. Thomas Island District']]
-
-
-
-
-def load_usafips(list_object):
-    return(pd.DataFrame(list_object,columns = ['statefp', 'state_name', 'countyfp', 'county_name']))
-
-def fmatch(row,minscore,choices):
-    match_choice = [x.lower() for x in choices]
-    answer = process.extract(str(row).lower(),match_choice,limit = 1)
-    print(answer)
-    choice,score = answer[0]
-    index = match_choice.index(choice)
-    return choices[index] if score >= minscore else None
-
-
-
-
-def render(table, params):
-    state_column = params['state']
-    county_column = params['county']
-    # fuzz_boolean = params['fuzzy']
-    fuzz_tolerance = params['tolerance']
-    addfips_boolean = params['addfips']
-
-
-    # If no column is selected, do nothing. By convention, Workbench modules
-    # should output their input until enough parameters are supplied.
-    if not state_column:
-        return table
-
-    # df_fips = load_usafips(data_path=  '/data/usa_fips.csv')
-    # df_fips = pd.read_csv('usa_fips.csv')
-    df_fips = load_usafips(usa_fips_list)
-    #cleaning only state
-    if not county_column:
-        # if fuzz_boolean:
-        state_choices = list(df_fips.state_name.unique())
-        table['state_name_fips'] = table.apply(lambda x : fmatch(x[state_column],fuzz_tolerance, state_choices),axis=1)
-
-        if addfips_boolean:
-           table['state_code_fips'] = table.merge(df_fips.loc[:,['statefp','state_name']].drop_duplicates(['statefp','state_name']), left_on='state_name_fips', right_on='state_name', how='left')['statefp']
-
-        # else:
-        #    table['state_code_fips'] = table.merge(df_fips.loc[:,['statefp','state_name']].drop_duplicates(['statefp','state_name']), left_on='name', right_on='state_name', how='left')['statefp']
-
-    #cleaning county and state
-    else:
-        state_choices = list(df_fips.state_name.unique())
-        table['state_name_fips'] = table.apply(lambda x : fmatch(x[state_column],fuzz_tolerance, state_choices),axis=1)
-
-
-        try:
-            table['county_name_fips'] = table.apply(lambda x : fmatch(x[county_column],fuzz_tolerance, list(df_fips.loc[df_fips.state_name == x['state_name_fips']].county_name)),axis=1)
-        except StopIteration:
-            return
-
-        if addfips_boolean:
-            table['state_code_fips'] = table.merge(df_fips.loc[:,['statefp','state_name']].drop_duplicates(['statefp','state_name']), left_on='state_name_fips', right_on='state_name', how='left')['statefp']
-            table['county_code_fips'] = table.merge(df_fips, left_on=['state_name_fips','county_name_fips'], right_on=['state_name','county_name'], how='left')['countyfp']
-
-
-            print(0)
-
-
-
-
-    return(table)
+['78', 'U.S. Virgin Islands', '30', 'St. Thomas Island District'],
