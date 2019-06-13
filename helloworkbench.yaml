@@ -1,5 +1,5 @@
 id_name: helloworkbench
-name: Achyut
+name: FIPS
 category: Analyze
 description: Multiply a column by a constant.
 help_url: modules/analyze/hello-workbench
