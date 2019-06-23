@@ -16,9 +16,9 @@ parameters:
 #   type: checkbox
 #   default: true
 - id_name: tolerance
-  name: Tolerance
+  name: Fuzzy Match Percentage
   type: float
-  default: 2.0
+  default: 75
 - name: Add FIPS
   id_name: addfips
   type: checkbox
